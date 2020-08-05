@@ -235,6 +235,8 @@ import FlightSuretyApp from '../../build/contracts/FlightSuretyApp.json'
         flight,
         timestamp,
         (error, result) => {
+            console.log('error: ' + error)
+            console.log('result: ' + result)
           display('Oracles', 'Trigger oracles', [
             { label: 'Fetch Flight Status', error: error, value: result }
           ])

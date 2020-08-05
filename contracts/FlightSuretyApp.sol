@@ -142,7 +142,7 @@ contract FlightSuretyApp {
         uint regAirlineCount = flightSuretyData.getRegAirlineCount();
 
         //check num of registered airlines
-        if(regAirlineCount <= CONSENSUS_THRESHOLD){
+        if(regAirlineCount < CONSENSUS_THRESHOLD){
             // flightSuretyData.registerAirline(airlineAdr);
             success = flightSuretyData.registerAirline(airlineAdr);
         }
@@ -251,8 +251,10 @@ contract FlightSuretyApp {
 
         //check status code
         if(_statusCode == STATUS_CODE_LATE_AIRLINE){
-            uint multiplier = uint(1).mul(uint(150)).div(uint(100));
-            flightSuretyData.creditInsurees(_airline, _flightName,_timestamp, multiplier);
+            // uint multiplier = uint(1).mul(uint(150)).div(uint(100));
+            uint multiplier = 15;
+            uint dividend = 10;
+            flightSuretyData.creditInsurees(_airline, _flightName,_timestamp, multiplier, dividend);
         }
 
 
@@ -373,6 +375,7 @@ contract FlightSuretyApp {
                         )
                         external
     {
+        //check if the oracle has the correct index that was assinged to it
         require((oracles[msg.sender].indexes[0] == index) || (oracles[msg.sender].indexes[1] == index) || (oracles[msg.sender].indexes[2] == index), "Index does not match oracle request");
 
 
@@ -462,7 +465,7 @@ abstract contract FlightSuretyData{
     function getRegAirlineCount() virtual external pure returns (uint);
     function isRegistered(address airlineAddress) virtual external view returns (bool);
     function buy (address _airline, string calldata _flightName, uint256 _timestamp, address _passenger, uint amount) virtual external payable;
-    function creditInsurees (address _airline, string calldata _flightName, uint256 _timestamp, uint _multiplier) virtual external;
+    function creditInsurees (address _airline, string calldata _flightName, uint256 _timestamp, uint _multiplier, uint _dividend) virtual external;
     function getAmountInsuredByPassenger(address _airline, string calldata _flightName, uint256 _timestamp, address _passenger) virtual external view returns(uint amount);
     function fund(address airline, uint amount) virtual external payable;
     function getFunding(address airline) virtual external view returns (uint);

@@ -20,6 +20,7 @@ contract FlightSuretyData {
 
     struct PassengerInsurance{
         bool registered;
+        bool isAlreadyCredited;
         uint amount;
     }
 
@@ -220,6 +221,7 @@ contract FlightSuretyData {
     function getAmountInsuredByPassenger(address _airline, string calldata _flightName, uint256 _timestamp, address _passenger) internal requireAuthorizedCaller view returns(uint amount){
         bytes32 flightKey = getFlightKey(_airline, _flightName, _timestamp);
         return passengerFlightInsurances[_passenger][flightKey].amount;
+
     }
 
     function isFlightInsuredByPassenger(address airline, string calldata flightName, uint256 timestamp, address passenger)
@@ -227,23 +229,30 @@ contract FlightSuretyData {
         return passengerFlightInsurances[passenger][getFlightKey(airline, flightName, timestamp)].registered;
     }
 
+
     /**
      *  @dev Credits payouts to insurees
     */
-    function creditInsurees (address _airline, string calldata _flightName, uint256 _timestamp, uint _multiplier) external requireIsOperational requireAuthorizedCaller
+    function creditInsurees (address _airline, string calldata _flightName, uint256 _timestamp, uint _multiplier, uint _dividend)
+    external requireIsOperational requireAuthorizedCaller
     {
 
+        bytes32 flightKey = getFlightKey(_airline, _flightName, _timestamp);
         //find passengers who are affected by the flight
         address[] memory insuredPassengersByFlightList = getInsuredPassengersByFlight(_airline, _flightName, _timestamp);
-
         //credit accounts of insurees
         for(uint i=0; i < insuredPassengersByFlightList.length; i++){
             //get amount paid by insuree for the flight
             address passenger = insuredPassengersByFlightList[i];
-            uint insuredAmount = getAmountInsuredByPassenger( _airline, _flightName, _timestamp, passenger);
-            uint amountToCredit = insuredAmount.mul(_multiplier);
-            //credit multiplier
-            passengerCredit[passenger] = passengerCredit[passenger].add(amountToCredit);
+
+            if(!passengerFlightInsurances[passenger][flightKey].isAlreadyCredited){
+                uint insuredAmount = passengerFlightInsurances[passenger][flightKey].amount;
+                uint amountToCredit = (insuredAmount.mul(_multiplier)).div(_dividend);
+                //credit multiplier
+                passengerCredit[passenger] = passengerCredit[passenger].add(amountToCredit);
+                passengerFlightInsurances[passenger][flightKey].isAlreadyCredited = true;
+            }
+
         }
     }
 

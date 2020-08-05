@@ -177,19 +177,6 @@ web3.eth.getAccounts().then(accounts => {
     })
 })
 
-
-flightSuretyApp.events.OracleRequest(
-  {
-    fromBlock: 0
-  },
-  function (error, event) {
-    if (error) console.log(error)
-    else {
-      console.log('Received OracleRequest event:  ' + JSON.stringify(event))
-    }
-  }
-)
-
 flightSuretyApp.events.FlightStatusInfo(
   {
     fromBlock: 0
