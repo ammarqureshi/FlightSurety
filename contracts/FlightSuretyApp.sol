@@ -38,7 +38,7 @@ contract FlightSuretyApp {
 
     bool operational;
     address flightSuretyDataContractAddress;
-    uint8 private constant CONSENSUS_THRESHOLD = 4;
+    uint8 private constant CONSENSUS_THRESHOLD = 3;
     mapping(bytes32 => Flight) private flights;
     mapping(address => address[]) private airlineVoters;
 
@@ -81,7 +81,7 @@ contract FlightSuretyApp {
     }
 
     modifier airlineRegistered(){
-        require(flightSuretyData.isRegistered(msg.sender), "already registered");
+        require(flightSuretyData.isRegistered(msg.sender), "airline not registered");
         _;
     }
 
@@ -175,6 +175,28 @@ contract FlightSuretyApp {
         return (success, currVotes);
     }
 
+    function getRegisteredAirlineCount() public requireIsOperational view returns(uint){
+        return flightSuretyData.getRegAirlineCount();
+    }
+
+
+    function getRegisteredAirlines() public requireIsOperational view returns(address[] memory){
+        return flightSuretyData.getRegisteredAirlines();
+    }
+
+    function getPassengerBalance() public requireIsOperational view returns(uint balance){
+        return flightSuretyData.getPassengerBalance(msg.sender);
+    }
+
+    function getAirlineBalance(address airline) public requireIsOperational view returns (uint){
+        return flightSuretyData.getAirlineBalance(airline);
+    }
+
+    function withdrawFunds(uint amountToWithdraw) public requireIsOperational returns (uint){
+        require(flightSuretyData.getPassengerBalance(msg.sender) >= amountToWithdraw, 'withdraw amount exceeds balance');
+        return flightSuretyData.withdrawFunds(msg.sender, amountToWithdraw);
+    }
+
     function fundAirline() public requireIsOperational airlineRegistered payable {
         //credit data contract
         flightSuretyDataContractAddress.call.value(msg.value)("");
@@ -183,6 +205,7 @@ contract FlightSuretyApp {
         flightSuretyData.fund(msg.sender, msg.value);
 
     }
+
    /**
     * @dev Register a future flight for insuring.
     *
@@ -439,11 +462,15 @@ abstract contract FlightSuretyData{
     function getRegAirlineCount() virtual external pure returns (uint);
     function isRegistered(address airlineAddress) virtual external view returns (bool);
     function buy (address _airline, string calldata _flightName, uint256 _timestamp, address _passenger, uint amount) virtual external payable;
-    // function getInsuredPassengersByFlight(address _airline, string calldata _flightName, uint256 timestamp) virtual external view returns (address[] memory);
     function creditInsurees (address _airline, string calldata _flightName, uint256 _timestamp, uint _multiplier) virtual external;
     function getAmountInsuredByPassenger(address _airline, string calldata _flightName, uint256 _timestamp, address _passenger) virtual external view returns(uint amount);
     function fund(address airline, uint amount) virtual external payable;
     function getFunding(address airline) virtual external view returns (uint);
     function isOperational() virtual external view returns(bool);
+    function getRegisteredAirlines() virtual external view returns(address[] memory);
+    function getPassengerBalance(address passenger) virtual external view returns (uint);
+    function withdrawFunds(address passenger, uint amoutToWithdraw) virtual external returns(uint);
+    function getAirlineBalance(address airline) virtual external view returns (uint);
+
 
 }

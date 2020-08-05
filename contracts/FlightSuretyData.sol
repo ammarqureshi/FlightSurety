@@ -47,6 +47,7 @@ contract FlightSuretyData {
         contractOwner = msg.sender;
         //register first airline
         registeredAirlines.push(firstAirlineAdr);
+        registered[firstAirlineAdr] = true;
     }
 
     /********************************************************************************************/
@@ -151,6 +152,34 @@ contract FlightSuretyData {
 
     function getRegAirlineCount() external requireAuthorizedCaller view returns (uint){
         return registeredAirlines.length;
+    }
+
+    function getPassengerBalance(address passenger) external requireAuthorizedCaller view returns (uint){
+        return passengerCredit[passenger];
+    }
+
+    function getAirlineBalance(address airline) external requireAuthorizedCaller view returns (uint){
+        return airlineContributions[airline];
+    }
+
+
+    function withdrawFunds(address passenger, uint amountToWithdraw) external requireAuthorizedCaller returns(uint){
+
+        require(passengerCredit[passenger] >= amountToWithdraw, 'withdraw amount exceeds passenger balance');
+
+        //reduce passenger balance
+        passengerCredit[passenger] = passengerCredit[passenger].sub(amountToWithdraw);
+
+        //credit passenger
+        address(passenger).call.value(amountToWithdraw)("");
+
+        //return remaining passenger balance
+        return passengerCredit[passenger];
+
+    }
+
+    function getRegisteredAirlines() external requireAuthorizedCaller view returns(address[] memory){
+        return registeredAirlines;
     }
 
    /**

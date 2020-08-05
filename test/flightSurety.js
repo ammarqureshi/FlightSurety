@@ -103,4 +103,22 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
 
+  it('register another airline', async() =>{
+
+    await config.flightSuretyData.setOperatingStatus(true);
+    await config.flightSuretyData.setOperatingStatus(false);
+    //fund airline
+    await config.flightSuretyApp.fundAirline({from: config.firstAirline, value: 11});
+
+    //register another airline
+    await config.flightSuretyApp.registerAirline(accounts[3], {from: config.firstAirline});
+
+    //verify new airline is registered
+    let registeredAirlines = config.flightSuretyApp.getRegisteredAirlines();
+    console.log('registered airline: ' + registeredAirlines);
+
+  })
+
+
+
 });
