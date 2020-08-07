@@ -10,7 +10,7 @@
   "scripts": {
     "compile": "./node_modules/truffle/build/cli.bundled.js compile",
     "migrate": "./node_modules/truffle/build/cli.bundled.js migrate --network development --reset --compile-all",
-    "test": "./node_modules/truffle/build/cli.bundled.js test ./test/flightSurety.js",
+    "testContract": "./node_modules/truffle/build/cli.bundled.js test ./test/flightSurety.js",
     "testOracle": "./node_modules/truffle/build/cli.bundled.js test ./test/oracles.js",
     "ganache": "ganache-cli -l 99999999999999 -a 50 -m 'doll source together survey box meat assist green sand conduct ostrich ginger'",
     "dapp": "webpack-dev-server --mode development --config webpack.config.dapp.js",
