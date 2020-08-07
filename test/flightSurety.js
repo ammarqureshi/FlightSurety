@@ -106,10 +106,9 @@ contract('Flight Surety Tests', async (accounts) => {
   it('register another airline', async() =>{
 
     await config.flightSuretyData.setOperatingStatus(true);
-    await config.flightSuretyData.setOperatingStatus(false);
     //fund airline
-    await config.flightSuretyApp.fundAirline({from: config.firstAirline, value: 11});
-
+    console.log('value: ' + web3.utils.toWei('10', 'ether'))
+    await config.flightSuretyApp.fundAirline({from: config.firstAirline, value: web3.utils.toWei('10', 'ether')});
     //register another airline
     await config.flightSuretyApp.registerAirline(accounts[3], {from: config.firstAirline});
 
