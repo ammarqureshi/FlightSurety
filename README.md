@@ -14,25 +14,24 @@ To install, download or clone the repo, then:
 `npm run ganache`
 
 ## Develop Client
-compile: 
+
+ ### to compile: 
 `npm run compile`
 
-to test:
+### to test:
 `truffle develop`
 `truffle test`
 
-to migrate to local ganache environment:
+### to migrate to local ganache environment:
 `npm run migrate`
 
-
-To view dapp:
+### to view dapp:
 
 `http://localhost:8000`
 
 ## Develop Server
 
 `npm run server`
-`truffle test ./test/oracles.js`
 
 ## Deploy
 
