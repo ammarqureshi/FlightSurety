@@ -13,13 +13,13 @@ export default class Contract {
     this.initialize(callback)
     this.owner = null
     this.airlines = []
-    this.airlineIds = ['DELTA', 'UNITED', 'ALASKA', 'SOUTHWEST', 'JET']
+    this.airlineIds = ['EMIRATES', 'UNITED', 'ALASKA', 'SOUTHWEST', 'TURKISH']
     this.passengers = []
-    this.passengerIds = ['MARK', 'JOHN', 'RAVI', 'SMITH', 'SHRUTI']
+    this.passengerIds = ['SARAH', 'JOHN', 'BEN', 'SMITH', 'ROB']
     this.flightIds = [
-      'D01',
-      'D02',
-      'D03',
+      'E01',
+      'E02',
+      'E03',
       'U01',
       'U02',
       'U03',
@@ -29,9 +29,9 @@ export default class Contract {
       'S01',
       'S02',
       'S03',
-      'J01',
-      'J02',
-      'J03'
+      'T01',
+      'T02',
+      'T03'
     ]
   }
 
