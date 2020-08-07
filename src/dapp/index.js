@@ -55,6 +55,7 @@ import FlightSuretyApp from '../../build/contracts/FlightSuretyApp.json'
     contract.getPassengerBalance(passenger, (error, result) => {
       if (!error) {
         const funds = contract.web3.utils.fromWei(result, 'ether')
+        console.log('passenger balance : ' + funds)
         populateBalance(funds)
       }
     })

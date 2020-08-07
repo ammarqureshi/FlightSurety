@@ -89,6 +89,45 @@ input {
     display: block;
   }
 
+  h1{
+    margin-bottom:20px;
+    padding:0px;
+  }
+
+  h4{
+    margin-bottom: 10px;
+  }
+
+  .mr-sm-2{
+
+    /* margin-right: 15px; */
+    margin-left: 15px;
+
+  }
+
+   /* span {
+    display: block;
+  } */
+/*
+  label{
+    display: block;
+  } */
+
+  .mb-2{
+    /* display: block; */
+    margin-top: 15px;
+  }
+
+  .mb-3{
+     /* display: block; */
+    margin-top: 20px;
+  }
+
+  input:focus::placeholder {
+    color: transparent;
+  }
+
+
   .dropdown a:hover {background-color: #ddd;}
 
   .show {display: block;}

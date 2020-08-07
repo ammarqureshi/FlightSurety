@@ -17,7 +17,6 @@ contract FlightSuretyApp {
     FlightSuretyData private flightSuretyData;
 
 
-    // Flight status codees
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
     uint8 private constant STATUS_CODE_LATE_AIRLINE = 20;
@@ -38,7 +37,7 @@ contract FlightSuretyApp {
 
     bool operational;
     address flightSuretyDataContractAddress;
-    uint8 private constant CONSENSUS_THRESHOLD = 3;
+    uint8 private constant CONSENSUS_THRESHOLD = 4;
     mapping(bytes32 => Flight) private flights;
     mapping(address => address[]) private airlineVoters;
 
@@ -80,8 +79,14 @@ contract FlightSuretyApp {
         _;
     }
 
-    modifier airlineRegistered(){
-        require(flightSuretyData.isRegistered(msg.sender), "airline not registered");
+    modifier airlineRegistered(address airline){
+         require(flightSuretyData.isRegistered(airline), "airline not registered");
+        _;
+    }
+
+    modifier timestampValid(uint timestamp){
+        uint currBlockTime = block.timestamp;
+        require(timestamp >= currBlockTime, "airline times must be in the future");
         _;
     }
 
@@ -129,7 +134,7 @@ contract FlightSuretyApp {
                             )
                             external
                             requireIsOperational
-                            airlineRegistered
+                            airlineRegistered(msg.sender)
                             airlineHasContirbutedMinFunding
                             returns(bool _success, uint256 _votes)
     {
@@ -197,7 +202,7 @@ contract FlightSuretyApp {
         return flightSuretyData.withdrawFunds(msg.sender, amountToWithdraw);
     }
 
-    function fundAirline() public requireIsOperational airlineRegistered payable {
+    function fundAirline() public requireIsOperational airlineRegistered(msg.sender) payable {
         //credit data contract
         flightSuretyDataContractAddress.call.value(msg.value)("");
 
@@ -218,6 +223,8 @@ contract FlightSuretyApp {
                                 )
                                 external
                                 requireIsOperational
+                                airlineRegistered(airline)
+                                timestampValid(timestamp)
                                 payable
 
     {
@@ -225,6 +232,9 @@ contract FlightSuretyApp {
         //check that insurance has not been bought for this flight before by the passenger
         require(!flightSuretyData.isFlightInsuredByPassenger(airline, flightName, timestamp, msg.sender),
             "this flight has already been insured by the caller");
+
+        //max 1 ether allowed
+        require(msg.value<= MAX_INSURANCE_FLIGHT_BY_PASSENGER, "insurance amoutn can not be more than 1 ether");
 
         //transfer the amount to contract
         (bool success, ) = flightSuretyDataContractAddress.call.value(msg.value)("");
@@ -251,7 +261,6 @@ contract FlightSuretyApp {
 
         //check status code
         if(_statusCode == STATUS_CODE_LATE_AIRLINE){
-            // uint multiplier = uint(1).mul(uint(150)).div(uint(100));
             uint multiplier = 15;
             uint dividend = 10;
             flightSuretyData.creditInsurees(_airline, _flightName,_timestamp, multiplier, dividend);
@@ -269,6 +278,9 @@ contract FlightSuretyApp {
                             uint256 timestamp
                         )
                         external
+                        requireIsOperational
+                        airlineRegistered(airline)
+
 
     {
         uint8 index = getRandomIndex(msg.sender);
